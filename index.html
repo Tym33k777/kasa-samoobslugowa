@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Kasa Samoobsługowa</title>
+  <style>
+    body { font-family: sans-serif; background: #f7f7f7; text-align: center; padding: 20px; }
+    video { width: 300px; border: 2px solid #333; }
+    #products, #total { margin-top: 20px; }
+    .product { padding: 5px; border-bottom: 1px solid #ccc; }
+    .total { font-size: 20px; margin-top: 10px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>Kasa Samoobsługowa</h1>
+  <video id="preview"></video>
+  <div id="products"></div>
+  <div class="total">Suma: <span id="total">0.00</span> zł</div>
+
+  <script src="https://unpkg.com/@zxing/library@latest"></script>
+  <script>
+    const products = {
+      "5901234123457": { name: "Mleko 2%", price: 3.49 },
+      "5900987654321": { name: "Chleb pszenny", price: 2.99 },
+      "5901111111111": { name: "Sok pomarańczowy", price: 4.79 },
+    };
+
+    let total = 0;
+
+    const codeReader = new ZXing.BrowserBarcodeReader();
+    const preview = document.getElementById('preview');
+    const productsDiv = document.getElementById('products');
+    const totalEl = document.getElementById('total');
+
+    function addProduct(code) {
+      if (products[code]) {
+        const item = products[code];
+        total += item.price;
+        const p = document.createElement('div');
+        p.className = 'product';
+        p.textContent = `${item.name} - ${item.price.toFixed(2)} zł`;
+        productsDiv.appendChild(p);
+        totalEl.textContent = total.toFixed(2);
+      } else {
+        alert("Nieznany kod: " + code);
+      }
+    }
+
+    codeReader.decodeFromVideoDevice(null, 'preview', (result, err) => {
+      if (result) {
+        addProduct(result.getText());
+      }
+    });
+  </script>
+</body>
+</html>
